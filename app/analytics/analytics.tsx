@@ -53,7 +53,7 @@ export default function ProgressTracking() {
                 <p className="text-slate-400 text-lg leading-relaxed font-medium mb-10 italic">
                   "Based on your 200+ math queries, our AI identified that you solve Calculus 40% faster than average, but skip Probability derivations. Recommended focus: Master Combinations logic before Sunday's test."
                 </p>
-                <button className="bg-indigo-600 hover:bg-indigo-500 px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all">Get Detailed Roadmap</button>
+               
              </div>
              <div className="lg:absolute right-[-10%] opacity-10 rotate-12 hidden lg:block">
                  <BarChart3 size={500} />

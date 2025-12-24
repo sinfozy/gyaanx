@@ -17,7 +17,6 @@ const learningLinks = [
 const featureLinks = [
   { label: "AI Doubt Solver", path: "/features/ai-tutor" },
   { label: "Daily Quizzes", path: "/features/quizzes" },
-  { label: "Notes & PDFs", path: "/notes" },
   { label: "Progress Tracking", path: "/analytics" },
 ];
 
