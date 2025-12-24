@@ -1,0 +1,10 @@
+# Allow all crawlers
+User-agent: *
+
+# Disallow crawling of sensitive student pages
+Disallow: /dashboard/
+Disallow: /onboarding/
+Disallow: /api/
+
+# Specify the sitemap location
+Sitemap: https://gyaanx.ai/sitemap.xml

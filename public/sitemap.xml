@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
+  <url>
+    <loc>https://gyaanx.ai/</loc>
+    <lastmod>2025-12-24</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/about</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/auth</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Courses -->
+  <url>
+    <loc>https://gyaanx.ai/minorclasses</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/courses/senior-excellence</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/courses/competitive</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/courses/ssc</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/courses/banking-railways</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Features -->
+  <url>
+    <loc>https://gyaanx.ai/features/ai-tutor</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/features/quizzes</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/features/notes</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Miscellaneous -->
+  <url>
+    <loc>https://gyaanx.ai/success-stories</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/legal/privacy</loc>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://gyaanx.ai/legal/terms</loc>
+    <priority>0.3</priority>
+  </url>
+</urlset>
