@@ -67,8 +67,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-6 tracking-wide uppercase text-sm">Contact Us</h4>
             <div className="space-y-4">
-              <Link href="mailto:support@gyaanx.eu" className="flex items-center gap-3 text-slate-400 hover:text-indigo-400 transition-colors text-sm">
-                <Mail className="h-4 w-4 text-indigo-500" /> support@gyaanx.eu
+              <Link href="mailto:support@gyaanx.online" className="flex items-center gap-3 text-slate-400 hover:text-indigo-400 transition-colors text-sm">
+                <Mail className="h-4 w-4 text-indigo-500" /> support@gyaanx.online
               </Link>
              
             </div>
@@ -77,9 +77,11 @@ export default function Footer() {
 
         {/* Bottom Section */}
         <div className="pt-6 border-t border-slate-800 flex flex-col md:flex-row-reverse justify-between items-center gap-6 text-center md:text-left ">
+          <Link href="https://infozysms.com">
           <p className="text-sm text-slate-500 font-medium mr-110">
          © 2025 Infozy SMS & AI IntelliSoft LLP. All rights reserved.
-          </p>
+          </p></Link>
+          
         </div>
       </div>
     </footer>
