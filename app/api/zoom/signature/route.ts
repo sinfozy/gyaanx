@@ -1,5 +1,7 @@
 // /api/zoom/signature/route.ts
 import { NextResponse } from 'next/server';
+// @ts-ignore
+
 import { KJUR } from 'jsrsasign';
 
 export async function POST(request: Request) {

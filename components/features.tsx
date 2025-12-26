@@ -58,7 +58,7 @@ export default function Features() {
   };
 
   return (
-    <section className="bg-[#f9faff] py-20 px-4 min-h-screen flex items-center">
+    <section className="bg-[#f9faff] py-20 flex items-center ">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature) => {
           const colors = themeColors[feature.colorName];

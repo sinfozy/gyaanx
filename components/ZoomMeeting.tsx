@@ -13,64 +13,86 @@ interface ZoomProps {
 
 const ZoomMeeting = ({ meetingNumber, passWord, userName, userEmail, signature, sdkKey, role }: ZoomProps) => {
   const isInitialized = useRef(false);
+  const meetingSDKElementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const initMeeting = async () => {
-      if (isInitialized.current) return;
+    // Prevent double initialization in React Strict Mode
+    if (isInitialized.current) return;
 
-      const checkZoom = setInterval(async () => {
-        // @ts-ignore
-        if (typeof window !== "undefined" && window.ZoomMtgEmbedded) {
-          clearInterval(checkZoom);
+    const startMeeting = async () => {
+      // Check if Zoom script is loaded on window
+      if (typeof window !== "undefined" && (window as any).ZoomMtgEmbedded) {
+        try {
+          const client = (window as any).ZoomMtgEmbedded.createClient();
           
-          try {
-            // @ts-ignore
-            const client = window.ZoomMtgEmbedded.createClient();
-            const meetingSDKElement = document.getElementById("meetingSDKElement");
+          // 1. Initialize the client
+          await client.init({
+            zoomAppRoot: meetingSDKElementRef.current,
+            language: "en-US",
+            patchJsMedia: true,
+            leaveUrl: window.location.origin + "/dashboard", // Redirects back after meeting ends
+          });
 
-            if (!meetingSDKElement) return;
+          // 2. Join the meeting
+          await client.join({
+            sdkKey: sdkKey,
+            signature: signature,
+            meetingNumber: meetingNumber,
+            password: passWord,
+            userName: userName,
+            userEmail: userEmail,
+          });
 
-            await client.init({
-              zoomAppRoot: meetingSDKElement,
-              language: "en-US",
-              patchJsMedia: true,
-              leaveUrl: window.location.origin + "/dashboard",
-            });
-
-            // Join call with Error catching
-            const joinResponse = await client.join({
-              sdkKey: sdkKey,
-              signature: signature,
-              meetingNumber: meetingNumber,
-              password: passWord,
-              userName: userName,
-              userEmail: userEmail,
-            });
-
-            console.log("✅ Joined Successfully:", joinResponse);
-            isInitialized.current = true;
-
-          } catch (error: any) {
-            console.error("❌ Zoom Error Details:", error);
-            // अगर कोई एरर आता है तो स्क्रीन पर अलर्ट दिखेगा
-            alert(`Zoom Connection Error: ${error.reason || "Invalid Meeting ID or Signature"}`);
+          console.log("✅ GyaanX Neural Bridge Established");
+          isInitialized.current = true;
+        } catch (error: any) {
+          console.error("❌ Zoom Connection Error:", error);
+          // If signature is the issue, it usually fails here
+          if (error.type === "INVALID_PARAMETERS") {
+            alert("Meeting Details Invalid. Please try again from Dashboard.");
           }
         }
-      }, 1000);
-      return () => clearInterval(checkZoom);
+      }
     };
 
-    initMeeting();
-  }, [meetingNumber, passWord, userName, signature, sdkKey, userEmail, role]);
+    // Small delay to ensure the DOM element ref is attached
+    const timer = setTimeout(() => {
+      startMeeting();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [meetingNumber, passWord, userName, signature, sdkKey, userEmail]);
 
   return (
-    <div className="w-full h-[650px] bg-black rounded-[2.5rem] overflow-hidden shadow-2xl relative border-4 border-slate-900">
-      {/* Zoom specifically needs this wrapper to have 100% height */}
-      <div id="meetingSDKElement" className="w-full h-full min-h-[600px]"></div>
+    <div className="w-screen h-screen bg-black overflow-hidden">
+      {/* Zoom mounts the UI inside this div */}
+      <div 
+        ref={meetingSDKElementRef} 
+        id="meetingSDKElement" 
+        className="w-full h-full"
+      ></div>
       
+      {/* Critical CSS for Zoom Embedded SDK */}
       <style jsx global>{`
-        #zmmtg-root { display: none; } /* Hide the default global root if it appears */
-        .meeting-client-pro-container { width: 100% !important; height: 100% !important; position: relative !important; }
+        /* Hide the legacy global root that causes black overlays */
+        #zmmtg-root { 
+          display: none !important; 
+        } 
+        
+        /* Force the embedded container to fill the screen */
+        .meeting-client-pro-container { 
+          width: 100% !important; 
+          height: 100% !important; 
+          position: fixed !important;
+          top: 0;
+          left: 0;
+        }
+
+        /* Ensure the video canvas expands */
+        canvas {
+          width: 100% !important;
+          height: 100% !important;
+        }
       `}</style>
     </div>
   );
