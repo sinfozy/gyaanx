@@ -7,6 +7,8 @@ const UserSchema = new Schema({
   isProfileComplete: { type: Boolean, default: false }, // NEW: to check if onboarding is done
   path: { type: String, default: "" }, // "school" or "comp"
   grade: { type: String, default: "" }, // "10th", "JEE", etc.
+  isSubscribed: { type: Boolean, default: false }, // If true, redirect to Dashboard
+  subscribedAt: Date,
   createdAt: { type: Date, default: Date.now },
 });
 

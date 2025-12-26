@@ -1,28 +1,46 @@
 import { NextResponse } from "next/server";
-// import { db } from "@/lib/db"; // Import your actual DB (Prisma/Mongoose/Firebase)
+import {connectToDB} from "@/lib/db";
+import { User } from "@/models/User";
+import { Subscription } from "@/models/subscription";
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { email, amount, paymentId } = await req.json();
+    const body = await request.json();
+    const { email, paymentId } = body;
 
-    // SERVER-SIDE LOGIC: 
-    // Find user by email and update their "isPaid" status to true
-    // Save the amount (199) and the Razorpay ID for records.
-    
-    /* Example Prisma code:
-    await db.user.update({
-      where: { email },
-      data: { 
-        isPaid: true,
-        paidAmount: amount,
-        paymentReference: paymentId 
-      }
+    if (!email || !paymentId) {
+      return NextResponse.json({ error: "Missing data" }, { status: 400 });
+    }
+
+    await connectToDB();
+
+    const user = await User.findOne({ email }).select("_id");
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // 1. Save the payment details for your own records/accounting
+    await Subscription.create({
+      userId: user._id,
+      paymentId: paymentId,
+      amount: 199,
+      status: "SUCCESS"
     });
-    */
 
-    console.log(`User ${email} paid ₹${amount}. Reference: ${paymentId}`);
-    return NextResponse.json({ success: true });
+    // 2. PERMANENTLY UNLOCK THE USER
+    // This is the line that ensures "Person A" never sees the paywall again
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id },
+      { isSubscribed: true, subscribedAt: new Date() }, // Set to true forever
+      { new: true, upsert: true } // Create user if they don't exist
+    );
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "Access granted permanently" 
+    });
   } catch (error) {
-    return NextResponse.json({ error: "DB Save Failed" }, { status: 500 });
+    console.error("Subscription Save Error:", error);
+    return NextResponse.json({ error: "Failed to save subscription" }, { status: 500 });
   }
 }

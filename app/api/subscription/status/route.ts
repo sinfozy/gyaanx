@@ -1,14 +1,31 @@
 import { NextResponse } from "next/server";
+import {connectToDB} from "@/lib/db"; // Your DB connection utility
+import { User } from "@/models/User";
+import { UserCheck } from "lucide-react";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
   const email = searchParams.get("email");
 
-  // SERVER-SIDE LOGIC: Look up this email in your DB
-  // const user = await db.user.findUnique({ where: { email } });
-  // const isPaid = user?.isPaid || false;
+  if (!email) {
+    return NextResponse.json({ isSubscribed: false }, { status: 400 });
+  }
 
-  const isPaid = false; // Placeholder logic - replace with your DB check
+  try {
+    await connectToDB();
+    
+    // Find the user by email in the database
+    const user = await User.findOne({ email });
+    console.log(user);
+    
 
-  return NextResponse.json({ isSubscribed: isPaid });
+    if (!user) {
+      return NextResponse.json({ isSubscribed: false });
+    }
+
+    // Return their actual subscription status from the DB
+    return NextResponse.json({ isSubscribed: user.isSubscribed });
+  } catch (error) {
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+  }
 }
