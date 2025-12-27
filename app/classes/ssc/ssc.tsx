@@ -258,7 +258,7 @@ function ModuleCard({title, topics, icon, description}: any) {
         >
             <div className="flex gap-8 items-center flex-1">
                 <div className="h-20 w-20 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                    {React.cloneElement(icon as React.ReactElement, { size: 32 })}
+{React.cloneElement(icon as React.ReactElement<{ size?: number }>, { size: 32 })}
                 </div>
                 <div>
                     <h4 className="text-2xl font-black italic text-slate-900 group-hover:text-indigo-600 mb-2">{title}</h4>

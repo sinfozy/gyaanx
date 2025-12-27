@@ -279,7 +279,7 @@ function ArenaCard({ icon, title, difficulty, players, onClick }: any) {
       className="bg-white p-10 rounded-[4rem] border border-slate-100 hover:shadow-2xl transition-all duration-500 group cursor-pointer text-center relative"
     >
        <div className="h-20 w-20 rounded-3xl bg-slate-50 flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-white transition-all mx-auto border border-transparent group-hover:border-slate-50 shadow-sm">
-          {React.cloneElement(icon as React.ReactElement, { size: 32 })}
+{React.cloneElement(icon as React.ReactElement<{ size?: number }>, { size: 32 })}
        </div>
        <h4 className="text-2xl font-black italic mb-2 tracking-tighter text-slate-900 leading-none">{title}</h4>
        <div className="flex flex-col gap-4 mt-8 pt-8 border-t border-slate-50">

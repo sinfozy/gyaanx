@@ -238,7 +238,8 @@ function PillarCard({ icon, title, text }: any) {
     return (
         <div className="bg-white p-12 rounded-[4rem] shadow-sm border border-slate-100 hover:shadow-2xl transition-all hover:translate-y-[-5px] group">
             <div className="h-16 w-16 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-indigo-50 transition-colors">
-                {React.cloneElement(icon as React.ReactElement, { size: 32 })}
+                {/* Fixed Line below */}
+                {React.cloneElement(icon as React.ReactElement<{ size?: number }>, { size: 32 })}
             </div>
             <h4 className="text-3xl font-black italic text-slate-950 mb-6 tracking-tight">{title}</h4>
             <p className="text-slate-500 font-medium italic text-lg leading-relaxed">{text}</p>
