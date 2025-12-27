@@ -72,16 +72,16 @@ export default function BankRailways() {
                         <p className="text-slate-400 text-xl mb-10 font-medium leading-relaxed max-w-lg">
                             Neural-optimized coaching for <span className="text-white italic">IBPS, SBI & RRB</span>. We don't just teach; we reprogram your exam-solving reflexes using AI.
                         </p>
-
+  <Link href="/auth">
                         <div className="flex flex-wrap gap-4 mb-12">
+                          
                             <button className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-10 py-5 rounded-2xl font-black uppercase text-sm tracking-widest transition-all transform hover:scale-105 shadow-xl shadow-emerald-500/20 flex items-center gap-3">
                                 Start Your Journey <ArrowRight size={18}/>
                             </button>
-                            <button className="bg-slate-800 hover:bg-slate-700 text-white px-10 py-5 rounded-2xl font-black uppercase text-sm tracking-widest transition-all flex items-center gap-3 border border-slate-700">
-                                View Curriculum
-                            </button>
+                           
+                           
                         </div>
-
+</Link>
                         <div className="grid grid-cols-3 gap-8 border-t border-slate-800 pt-10">
                             <div>
                                 <p className="text-3xl font-black text-white">94%</p>
