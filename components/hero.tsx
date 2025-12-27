@@ -1,4 +1,4 @@
-
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,10 +10,26 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-white pt-10 pb-20 lg:pt-16 lg:pb-32">
       
-      {/* --- Tawk.to Script --- */}
+      {/* --- Professional Tawk.to Integration --- */}
       <Script id="tawk-to-script" strategy="lazyOnload">
         {`
-          var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+          var Tawk_API = Tawk_API || {};
+          var Tawk_LoadStart = new Date();
+
+          // --- This block makes it professional and adds bottom margin ---
+          Tawk_API.customStyle = {
+              visibility : {
+                  desktop : {
+                      xOffset : 15,
+                      yOffset : 40  // Adds margin-bottom for desktop
+                  },
+                  mobile : {
+                      xOffset : 15,
+                      yOffset : 70  // Adds more margin-bottom for mobile to clear navigation
+                  }
+              }
+          };
+
           (function(){
             var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
             s1.async=true;
@@ -56,12 +72,19 @@ export default function Hero() {
 
             {/* Support Buttons Row */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                {/* --- Phone Button (To the Left) --- */}
-                
-                   
+                <Link href="tel:+916262232329">
+                    <Button variant="ghost" className="h-14 px-6 bg-indigo-50/50 text-indigo-700 hover:bg-indigo-100 rounded-2xl font-bold flex items-center gap-3 border border-indigo-100/50">
+                        <Phone size={18} className="fill-indigo-700 text-white" />
+                        +91 62622 32329
+                    </Button>
+                </Link>
 
-                {/* --- WhatsApp Button (To the Right) --- */}
-               
+                <Link href="https://wa.me/916262232329" target="_blank">
+                    <Button className="h-14 px-6 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-2xl font-bold flex items-center gap-3 border border-emerald-100 border-2">
+                        <MessageCircle size={18} className="fill-emerald-600 text-white" />
+                        Chat with Mentor
+                    </Button>
+                </Link>
             </div>
           </div>
 
@@ -92,7 +115,6 @@ export default function Hero() {
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
             />
             
-            {/* AI Assistant Chat Bubble */}
             <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md border border-indigo-100 p-6 rounded-3xl shadow-2xl">
               <div className="flex items-start gap-4">
                 <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -111,7 +133,6 @@ export default function Hero() {
              <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">AI Accuracy</div>
           </div>
         </div>
-
       </div>
     </section>
   );

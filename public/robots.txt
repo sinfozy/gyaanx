@@ -7,4 +7,4 @@ Disallow: /onboarding/
 Disallow: /api/
 
 # Specify the sitemap location
-Sitemap: https://gyaanx.ai/sitemap.xml
+Sitemap: https://gyaanx.online/sitemap.xml
