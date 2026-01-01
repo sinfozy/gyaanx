@@ -17,7 +17,7 @@ export default function Page({ searchParams }: any) {
           passWord={searchParams.pass}
           signature={searchParams.sig}
           userName={searchParams.name}
-          userEmail="student@gyaanx.ai"
+          userEmail="student@gyaanx.eu"
           sdkKey={process.env.NEXT_PUBLIC_ZOOM_SDK_KEY!}
           role={parseInt(searchParams.role)}
         />

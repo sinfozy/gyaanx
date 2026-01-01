@@ -8,7 +8,7 @@ import {
   LayoutGrid, Layers, Calendar, Database, BarChart2, 
   Settings, Bell, FlaskConical, Calculator, FileText, 
   Video, HelpCircle, Camera, X, Check,
-  Lock, Zap, Sparkles, ShieldCheck, ArrowRight, Loader2
+  Lock, Zap, Sparkles, ShieldCheck, ArrowRight, Loader2,Ticket
 } from "lucide-react";
 import AIChatBot from "@/components/AIchatBox";
 
@@ -34,7 +34,8 @@ const StudentDashboard = () => {
   // --- AUTH & SUBSCRIPTION STATES ---
   const [hasPaid, setHasPaid] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
-  
+  const [couponCode, setCouponCode] = useState("");
+const [couponLoading, setCouponLoading] = useState(false);
   // --- ZOOM STATES ---
   const [activeMeeting, setActiveMeeting] = useState<{id: string, pass: string, signature: string, role: number} | null>(null);
   const [isZoomLoading, setIsZoomLoading] = useState(false);
@@ -180,7 +181,7 @@ const StudentDashboard = () => {
   // --- RAZORPAY HANDLER ---
   const handlePayment = async () => {
     setLoading(true);
-    const email = localStorage.getItem("userEmail") || "student@gyaanx.ai";
+    const email = localStorage.getItem("userEmail") || "student@gyaanx.eu";
     const name = localStorage.getItem("userName") || "Student";
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -203,6 +204,30 @@ const StudentDashboard = () => {
     rzp.open();
     setLoading(false);
   };
+  const handleCouponRedeem = async () => {
+  if (!couponCode) return;
+  setCouponLoading(true);
+  try {
+    const email = localStorage.getItem("userEmail");
+    const res = await fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code: couponCode.trim().toUpperCase() }),
+    });
+
+    if (res.ok) {
+      setHasPaid(true); // Dashboard unlock karne ke liye
+      alert("Success! Access Granted via Coupon.");
+    } else {
+      const err = await res.json();
+      alert(err.message || "Invalid Code");
+    }
+  } catch (error) {
+    alert("Error validating coupon");
+  } finally {
+    setCouponLoading(false);
+  }
+};
 
   const navItems = [
     { id: "dashboard", name: "Dashboard", icon: <LayoutGrid size={20} /> },
@@ -218,25 +243,52 @@ const StudentDashboard = () => {
   );
 
   if (!hasPaid) return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6 relative">
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-      <div className="max-w-2xl w-full bg-white rounded-[3.5rem] shadow-2xl p-10 lg:p-16 text-center animate-in zoom-in duration-300">
-         <div className="flex justify-center mb-8">
-            <div className="p-5 bg-violet-50 rounded-full"><Sparkles className="w-12 h-12 text-violet-600" /></div>
+  <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6 relative">
+    <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+    <div className="max-w-2xl w-full bg-white rounded-[3.5rem] shadow-2xl p-10 lg:p-16 text-center animate-in zoom-in duration-300">
+       <div className="flex justify-center mb-8">
+          <div className="p-5 bg-violet-50 rounded-full"><Sparkles className="w-12 h-12 text-violet-600" /></div>
+       </div>
+       <h2 className="text-4xl font-black text-slate-950 mb-3 italic tracking-tighter uppercase">Level Up</h2>
+       <p className="text-slate-500 mb-10 text-lg leading-relaxed font-medium">Unlock full access to 24/7 AI Tutors, Live Batches, and Premium Quiz Library.</p>
+       
+       <div className="bg-[#020617] rounded-[2.5rem] p-10 text-white text-center shadow-xl mb-10">
+          <span className="bg-violet-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase italic flex items-center gap-2 mx-auto w-fit mb-4"> <Lock size={12} /> Pro Access </span>
+          <div className="text-6xl font-black mb-1 italic">₹199</div>
+          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-tighter">One-time Lifetime Upgrade Fee</p>
+       </div>
+
+       {/* Payment Button */}
+       <button onClick={handlePayment} disabled={loading || couponLoading} className="w-full bg-violet-600 hover:bg-violet-500 text-white py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-4 transition-all shadow-xl shadow-violet-100 disabled:opacity-50">
+          {loading ? "Processing..." : <>Unlock All Features <ArrowRight /></>}
+       </button>
+
+       {/* ✅ NEW: COUPON SECTION ADDED HERE */}
+       <div className="mt-8 pt-8 border-t border-slate-100">
+         <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-4 flex items-center justify-center gap-2 italic">
+           <Ticket size={14} className="text-violet-600" /> Have a batch access code?
+         </p>
+         <div className="flex gap-2 max-w-sm mx-auto">
+           <input 
+             type="text" 
+             placeholder="ENTER CODE"
+             value={couponCode}
+             onChange={(e) => setCouponCode(e.target.value)}
+             className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 text-sm font-black uppercase outline-none focus:border-violet-600 transition-all placeholder:text-slate-300"
+           />
+           <button 
+             onClick={handleCouponRedeem}
+             disabled={couponLoading || loading || !couponCode}
+             className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase hover:bg-violet-600 transition-all disabled:opacity-50 active:scale-95"
+           >
+             {couponLoading ? <Loader2 className="animate-spin" size={16}/> : "Apply"}
+           </button>
          </div>
-         <h2 className="text-4xl font-black text-slate-950 mb-3 italic tracking-tighter uppercase">Level Up</h2>
-         <p className="text-slate-500 mb-10 text-lg leading-relaxed font-medium">Unlock full access to 24/7 AI Tutors, Live Batches, and Premium Quiz Library.</p>
-         <div className="bg-[#020617] rounded-[2.5rem] p-10 text-white text-center shadow-xl mb-10">
-            <span className="bg-violet-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase italic flex items-center gap-2 mx-auto w-fit mb-4"> <Lock size={12} /> Pro Access </span>
-            <div className="text-6xl font-black mb-1 italic">₹199</div>
-            <p className="text-slate-400 font-bold text-[10px] uppercase tracking-tighter">One-time Lifetime Upgrade Fee</p>
-         </div>
-         <button onClick={handlePayment} disabled={loading} className="w-full bg-violet-600 hover:bg-violet-500 text-white py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-4 transition-all shadow-xl shadow-violet-100 disabled:opacity-50">
-            {loading ? "Processing..." : <>Unlock All Features <ArrowRight /></>}
-         </button>
-      </div>
+       </div>
+
     </div>
-  );
+  </div>
+);
 
   return (
     <div className="flex h-screen w-full bg-slate-50 overflow-hidden relative">

@@ -7,61 +7,77 @@
 //     const { email, password } = await req.json();
 //     await connectToDB();
 
+//     // 1. Find user in MongoDB
 //     const user = await User.findOne({ email });
 
+//     // 2. Requirement: "When non registered user try to login it should show user not registered"
 //     if (!user) {
-//       return NextResponse.json({ message: "Account not registered." }, { status: 404 });
+//       return NextResponse.json({ message: "User not registered with GyaanX." }, { status: 404 });
 //     }
 
+//     // 3. Password Check (Keep plain text per your code, but bcrypt is recommended later)
 //     if (user.password !== password) {
 //       return NextResponse.json({ message: "Incorrect password." }, { status: 401 });
 //     }
-    
 
+//     // 4. Return ALL critical data for your Dashboard Logic
 //     return NextResponse.json({ 
 //       success: true, 
-//       name: user.name, 
-//       email: user.email,
-//       isProfileComplete: user.isProfileComplete // Added this check
+//       name: user.name,          // Returned to show actual username on Dashboard
+//       email: user.email, 
+//       isProfileComplete: user.isProfileComplete || false,
+//       isPaid: user.isPaid || false // Persistent check for ₹199 subscription
 //     });
+
 //   } catch (error) {
-//     return NextResponse.json({ message: "Internal Error" }, { status: 500 });
+//     console.error("Login Error:", error);
+//     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
 //   }
 // }
 
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import { User } from "@/models/User";
+// import bcrypt from "bcryptjs"; // Jab aap security add karein
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
+
+    if (!email || !password) {
+      return NextResponse.json({ message: "Email and password are required." }, { status: 400 });
+    }
+
     await connectToDB();
 
-    // 1. Find user in MongoDB
-    const user = await User.findOne({ email });
+    // 1. Find user (Using .lean() for faster performance)
+    const user = await User.findOne({ email }).lean();
 
-    // 2. Requirement: "When non registered user try to login it should show user not registered"
+    // 2. Requirement: "User not registered" check
     if (!user) {
       return NextResponse.json({ message: "User not registered with GyaanX." }, { status: 404 });
     }
 
-    // 3. Password Check (Keep plain text per your code, but bcrypt is recommended later)
+    // 3. Password Check 
+    // Note: Agar aapne register me bcrypt use kiya hai toh yahan bcrypt.compare use hoga
     if (user.password !== password) {
       return NextResponse.json({ message: "Incorrect password." }, { status: 401 });
     }
 
-    // 4. Return ALL critical data for your Dashboard Logic
+    // 4. Final Response
+    // User object se password hata kar baki data bhej rahe hain
     return NextResponse.json({ 
       success: true, 
-      name: user.name,          // Returned to show actual username on Dashboard
-      email: user.email, 
-      isProfileComplete: user.isProfileComplete || false,
-      isPaid: user.isPaid || false // Persistent check for ₹199 subscription
+      user: {
+        name: user.name,
+        email: user.email, 
+        isProfileComplete: user.isProfileComplete || false,
+        isPaid: user.isPaid || false
+      }
     });
 
-  } catch (error) {
-    console.error("Login Error:", error);
+  } catch (error: any) {
+    console.error("Login Error:", error.message);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
