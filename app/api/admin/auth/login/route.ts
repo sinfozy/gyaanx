@@ -5,8 +5,8 @@ export async function POST(req: Request) {
   const { email, password } = await req.json();
 
   // ⚠️ Inhe apni choice ke credentials se badal dein
-  const ADMIN_EMAIL = "admin@gyaanx.eu";
-  const ADMIN_PASSWORD = "GYAANX_MASTER_2026";
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
   if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
     const cookieStore = await cookies();
