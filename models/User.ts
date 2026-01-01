@@ -10,6 +10,8 @@ const UserSchema = new Schema({
   isSubscribed: { type: Boolean, default: false }, // If true, redirect to Dashboard
   subscribedAt: Date,
   createdAt: { type: Date, default: Date.now },
+  otp:{ type: String, },
+  isVerified:{ type: Boolean, default: false }
 });
 
 export const User = models.User || model("User", UserSchema);
