@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Mail, Lock, User, ArrowRight, BrainCircuit, Zap, Brain, ShieldCheck, Loader2
+  Mail, Lock, User, ArrowRight, BrainCircuit, Zap, Brain, ShieldCheck, Loader2, ChevronLeft
 } from "lucide-react";
 import Link from "next/link";
 
@@ -42,7 +42,9 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false); 
-  
+  const [forgotStep, setForgotStep] = useState(0); 
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [otpInput, setOtpInput] = useState("");
   const [errors, setErrors] = useState<any>({});
@@ -50,6 +52,7 @@ export default function AuthPage() {
   const toggleAuth = () => {
     setIsLogin(!isLogin);
     setIsVerifying(false);
+    setForgotStep(0); // Reset forgot flow on toggle
     setErrors({});
   };
 
@@ -75,18 +78,15 @@ export default function AuthPage() {
 
       if (res.ok) {
         if (isLogin) {
-          // Case 1: Direct Dashboard (Already Verified)
           if (!data.needsVerification) {
             localStorage.setItem("userEmail", data.email);
             localStorage.setItem("userName", data.name);
             router.push("/dashboard");
           } else {
-            // Case 2: Login but needs OTP (Ghost User)
             setIsVerifying(true);
             setIsLogin(false);
           }
         } else {
-          // Case 3: Signup Success -> Show OTP Screen
           setIsVerifying(true);
         }
       } else {
@@ -97,6 +97,39 @@ export default function AuthPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleForgotRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrors({});
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: formData.email, type: "request" }),
+    });
+    if (res.ok) setForgotStep(2); 
+    else setErrors({ email: (await res.json()).message });
+    setIsLoading(false);
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if(newPassword !== confirmPassword) return setErrors({ pass: "Passwords do not match!" });
+    setIsLoading(true);
+    setErrors({});
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: formData.email, otp: otpInput, newPassword, type: "reset" }),
+    });
+    if (res.ok) {
+      alert("Password updated successfully!");
+      setForgotStep(0); 
+    } else {
+      setErrors({ otp: "Invalid OTP or request failed." });
+    }
+    setIsLoading(false);
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -128,22 +161,63 @@ export default function AuthPage() {
         
         <Link href="/" className="absolute top-8 left-8 md:left-10 z-50 flex items-center gap-2">
           <BrainCircuit className="text-indigo-500 w-6 h-6" />
-          <span className="text-white font-black text-2xl uppercase">Gyaan<span className="text-indigo-500">X</span></span>
+          <span className="text-white font-black text-2xl uppercase italic tracking-tighter">Gyaan<span className="text-indigo-500">X</span></span>
         </Link>
 
         <div className="relative w-full h-full flex items-center">
           
-          {/* LOGIN SIDE */}
+          {/* LOGIN / FORGOT PASS SIDE */}
           <section className={`w-full md:w-1/2 flex flex-col justify-start md:justify-center px-8 md:px-16 transition-all duration-700 ${!isLogin ? 'opacity-0 translate-x-12 pointer-events-none hidden md:flex' : 'opacity-100 translate-x-0 flex'}`}>
-            <h2 className="text-4xl font-extrabold text-white mb-2 italic">Welcome back!</h2>
-            <p className="text-slate-400 mb-8 text-sm uppercase tracking-widest italic opacity-60">Verified Users Only</p>
-            <form onSubmit={handleAuthSubmit}>
-              <AuthInput icon={<Mail size={18}/>} name="email" placeholder="Registered Email" value={formData.email} onChange={handleInputChange} error={errors.email} />
-              <AuthInput icon={<Lock size={18}/>} name="password" type="password" placeholder="Password" value={formData.password} onChange={handleInputChange} />
-              <button disabled={isLoading} className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50">
-                {isLoading ? <Loader2 className="animate-spin" /> : <>Login Portal <ArrowRight size={18} /></>}
-              </button>
-            </form>
+            <AnimatePresence mode="wait">
+              {forgotStep === 0 ? (
+                <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <h2 className="text-4xl font-extrabold text-white mb-2 italic">Welcome back!</h2>
+                  <p className="text-slate-400 mb-8 text-sm uppercase tracking-widest italic opacity-60">Verified Users Only</p>
+                  <form onSubmit={handleAuthSubmit}>
+                    <AuthInput icon={<Mail size={18}/>} name="email" placeholder="Registered Email" value={formData.email} onChange={handleInputChange} error={errors.email} />
+                    <AuthInput icon={<Lock size={18}/>} name="password" type="password" placeholder="Password" value={formData.password} onChange={handleInputChange} />
+                    
+                    {/* Forgot Password Link */}
+                    <div className="flex justify-end mb-4">
+                      <button type="button" onClick={() => setForgotStep(1)} className="text-[10px] text-indigo-400 font-bold uppercase hover:underline tracking-widest">Forgot Password?</button>
+                    </div>
+
+                    <button disabled={isLoading} className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50">
+                      {isLoading ? <Loader2 className="animate-spin" /> : <>Login Portal <ArrowRight size={18} /></>}
+                    </button>
+                  </form>
+                </motion.div>
+              ) : forgotStep === 1 ? (
+                <motion.div key="forgot1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                  <button onClick={() => setForgotStep(0)} className="flex items-center gap-1 text-slate-500 mb-4 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">
+                    <ChevronLeft size={14}/> Back to Login
+                  </button>
+                  <h2 className="text-3xl font-black text-white mb-2 uppercase italic">Recover</h2>
+                  <p className="text-slate-400 mb-8 text-xs font-bold uppercase tracking-widest opacity-60">OTP will be sent to your email</p>
+                  <form onSubmit={handleForgotRequest}>
+                    <AuthInput icon={<Mail size={18}/>} name="email" placeholder="Enter Registered Email" value={formData.email} onChange={handleInputChange} error={errors.email} />
+                    <button disabled={isLoading} className="w-full h-14 bg-indigo-600 rounded-2xl text-white font-bold uppercase tracking-widest text-xs">
+                      {isLoading ? <Loader2 className="animate-spin mx-auto"/> : "Request Reset OTP"}
+                    </button>
+                  </form>
+                </motion.div>
+              ) : (
+                <motion.div key="forgot2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                  <h2 className="text-3xl font-black text-white mb-2 uppercase italic flex items-center gap-2">Verify & Set <ShieldCheck className="text-emerald-500"/></h2>
+                  <p className="text-slate-400 mb-8 text-xs font-bold uppercase tracking-widest opacity-60">Reset for {formData.email}</p>
+                  <form onSubmit={handleResetPassword}>
+                    <input maxLength={6} placeholder="6 - digit code" value={otpInput} onChange={(e) => setOtpInput(e.target.value)} className="w-full bg-[#0f172a] border border-slate-800 rounded-2xl py-4 text-indigo-400 text-center text-xl font-black tracking-[10px] outline-none mb-4 focus:border-indigo-600 transition-all" />
+                    <AuthInput icon={<Lock size={18}/>} type="password" placeholder="New Password" value={newPassword} onChange={(e:any) => setNewPassword(e.target.value)} />
+                    <AuthInput icon={<Lock size={18}/>} type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e:any) => setConfirmPassword(e.target.value)} error={errors.pass} />
+                    <button disabled={isLoading} className="w-full h-14 bg-emerald-600 rounded-2xl text-white font-bold uppercase tracking-widest text-xs">
+                      {isLoading ? <Loader2 className="animate-spin mx-auto"/> : "Update Password"}
+                    </button>
+                    {errors.otp && <p className="text-red-500 text-[10px] text-center mt-4 font-bold uppercase">{errors.otp}</p>}
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <p className="mt-8 text-slate-500 text-[10px] font-black uppercase text-center block md:hidden tracking-widest">
               New here? <button onClick={toggleAuth} className="text-indigo-400 underline">Create Account</button>
             </p>
